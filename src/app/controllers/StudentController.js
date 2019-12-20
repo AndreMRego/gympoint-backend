@@ -9,7 +9,7 @@ class StudentController {
       email: Yup.string()
         .email()
         .required(),
-      age: Yup.number().required(),
+      nasc_date: Yup.date().required(),
       weight: Yup.number().required(),
       height: Yup.number().required(),
     });
@@ -35,7 +35,7 @@ class StudentController {
     const schema = Yup.object().shape({
       name: Yup.string(),
       email: Yup.string().email(),
-      age: Yup.number(),
+      nasc_date: Yup.date(),
       weight: Yup.number(),
       height: Yup.number(),
     });
@@ -44,15 +44,13 @@ class StudentController {
       return res.status(400).json({ error: 'Validation fails' });
     }
 
-    const { email } = req.body;
-
     const student = await Student.findByPk(req.params.id);
 
     if (!student) {
       return res.status(400).json({ error: 'Student not found' });
     }
 
-    const { id, name, age } = await student.update(req.body);
+    const { id, name, email, age } = await student.update(req.body);
 
     return res.json({ id, name, email, age });
   }
