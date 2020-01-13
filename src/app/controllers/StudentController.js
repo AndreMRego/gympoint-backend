@@ -1,8 +1,40 @@
+import { Op } from 'sequelize';
 import * as Yup from 'yup';
 import Student from '../models/Student';
 import User from '../models/User';
 
 class StudentController {
+  async show(req, res) {
+    const {
+      id,
+      name,
+      email,
+      nasc_date,
+      age,
+      weight,
+      height,
+    } = await Student.findByPk(req.params.id);
+
+    return res.json({ id, name, email, nasc_date, age, weight, height });
+  }
+
+  async index(req, res) {
+    const { q = '', page = 1 } = req.query;
+
+    const students = await Student.findAll({
+      where: {
+        name: {
+          [Op.iLike]: `%${q}%`,
+        },
+      },
+      order: ['name'],
+      limit: 20,
+      offset: (page - 1) * 20,
+    });
+
+    return res.json(students);
+  }
+
   async store(req, res) {
     const schema = Yup.object().shape({
       name: Yup.string().required(),
@@ -18,6 +50,11 @@ class StudentController {
       return res.status(400).json({ error: 'Validation fails' });
     }
 
+    const userExists = await User.findOne({ where: { email: req.body.email } });
+
+    if (userExists) {
+      return res.status(400).json({ error: 'User already exists.' });
+    }
     const adminExists = await User.findByPk(req.userId);
 
     if (!adminExists) {
@@ -53,6 +90,14 @@ class StudentController {
     const { id, name, email, age } = await student.update(req.body);
 
     return res.json({ id, name, email, age });
+  }
+
+  async delete(req, res) {
+    const student = await Student.findByPk(req.params.id);
+
+    await student.destroy();
+
+    return res.send();
   }
 }
 

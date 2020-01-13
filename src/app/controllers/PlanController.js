@@ -3,8 +3,20 @@ import Plan from '../models/Plan';
 import User from '../models/User';
 
 class PlanController {
+  async show(req, res) {
+    const { id, title, duration, price, total } = await Plan.findByPk(
+      req.params.id
+    );
+
+    return res.json({ id, title, duration, price, total });
+  }
+
   async index(req, res) {
+    const { page = 1 } = req.query;
+
     const plans = await Plan.findAll({
+      limit: 20,
+      offset: (page - 1) * 20,
       attributes: ['id', 'title', 'duration', 'price'],
     });
 

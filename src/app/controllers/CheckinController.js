@@ -5,6 +5,8 @@ import Student from '../models/Student';
 
 class CheckinController {
   async index(req, res) {
+    const { page = 1 } = req.query;
+
     const student = await Student.findByPk(req.params.id);
 
     if (!student) {
@@ -16,6 +18,8 @@ class CheckinController {
         student_id: student.id,
       },
       order: ['created_at'],
+      limit: 20,
+      offset: (page - 1) * 20,
     });
 
     return res.json(checkins);
