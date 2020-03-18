@@ -20,6 +20,7 @@ routes.post('/students/:id/checkins', CheckinController.store);
 routes.get('/students/:id/help-orders', HelpOrderController.index);
 routes.post('/students/:id/help-orders', HelpOrderController.store);
 
+routes.get('/', (req, res) => res.send('api online'));
 routes.use(authMiddleware);
 routes.put('/users', UserController.update);
 routes.get('/students', StudentController.index);
